@@ -1,0 +1,431 @@
+Before Bug fix,After Bug fix,Location,Bug type,Commit Message,Project URL,File Path,Fixed Commit,Buggy Commit,Test File,Coding Effort,Constructs,Lizard Features Buggy,Lizard Features Fixed,BLEU,crystalBLEU_score,BERT_score,label,reason
+"49             f.write(toml.dumps(data))
+50 
+51     @staticmethod
+52     def remove_package_from_pipfile(package_name, dev=False):
+53         pipfile_path = pipfile.Pipfile.find()
+54 
+55         # Read and append Pipfile.
+56         with open(pipfile_path, 'r') as f:
+57             p = toml.loads(f.read())
+58 
+59             key = 'dev-packages' if dev else 'packages'
+60             if package_name in p[key]:
+61                 del p[key][package_name]
+62 
+63         # Write Pipfile.
+64         data = format_toml(toml.dumps(p))
+65         with open(pipfile_path, 'w') as f:
+66             f.write(data)
+67 
+68     @staticmethod
+","49             f.write(toml.dumps(data))
+50 
+51     @staticmethod
+52     def remove_package_from_pipfile(package_name, dev=False):
+53         pipfile_path = pipfile.Pipfile.find()
+54 
+55         # Read and append Pipfile.
+56         with open(pipfile_path, 'r') as f:
+57             p = toml.loads(f.read())
+58 
+59             key = 'dev-packages' if dev else 'packages'
+60             if key in p:
+61                 if package_name in p[key]:
+62                     del p[key][package_name]
+63 
+64         # Write Pipfile.
+65         data = format_toml(toml.dumps(p))
+66         with open(pipfile_path, 'w') as f:
+67             f.write(data)
+68 
+69     @staticmethod
+","Before: 60, 61
+After: 60, 61, 62",fix typo in project.py,don't error out if group doesn't exist,https://github.com/pypa/pipenv,pipenv/project.py,e06727075a4a45d1be99db13513bc0b14643667c,d862ed6093dfd47f2800a9c9f5b6d7d2c48ab82c,0,539,"{'module': 1, 'expression_statement': 6, 'call': 10, 'attribute': 8, 'identifier': 40, '.': 8, 'argument_list': 10, '(': 11, ')': 11, 'decorated_definition': 1, 'decorator': 1, '@': 1, 'function_definition': 1, 'def': 1, 'parameters': 1, ',': 3, 'default_parameter': 1, '=': 5, 'false': 1, ':': 4, 'block': 4, 'assignment': 4, 'comment': 2, 'with_statement': 2, 'with': 2, 'with_clause': 2, 'with_item': 2, 'as_pattern': 2, 'string': 4, 'string_start': 4, 'string_content': 4, 'string_end': 4, 'as': 2, 'as_pattern_target': 2, 'conditional_expression': 1, 'if': 2, 'else': 1, 'if_statement': 1, 'comparison_operator': 1, 'in': 1, 'subscript': 3, '[': 3, ']': 3, 'delete_statement': 1, 'del': 1}","{'cyclomatic_complexity': 1, 'nloc': 2, 'token_count': 15, 'name': '__init__', 'long_name': '__init__( self )', 'start_line': 12, 'end_line': 13, 'full_parameters': ['self'], 'filename': '/home/set-iitgn-vm/.local/lib/python3.10/site-packages/Minecpp/pipenv/prev/pipenv/project.py', 'top_nesting_level': 1, 'fan_in': 0, 'fan_out': 0, 'general_fan_out': 0}","{'cyclomatic_complexity': 1, 'nloc': 2, 'token_count': 15, 'name': '__init__', 'long_name': '__init__( self )', 'start_line': 12, 'end_line': 13, 'full_parameters': ['self'], 'filename': '/home/set-iitgn-vm/.local/lib/python3.10/site-packages/Minecpp/pipenv/curr/pipenv/project.py', 'top_nesting_level': 1, 'fan_in': 0, 'fan_out': 0, 'general_fan_out': 0}",0.8288198676016757,0.830231316351752,"(tensor([0.9858]), tensor([0.9888]), tensor([0.9873]), tensor([0.9885]))",DEV,"Tool says it is a typo, but it actually prevents keyerror if package group does not exist in pipfile."
+"67             f.write(data)
+68 
+69     @staticmethod
+70     def add_package_to_pipfile(package_name, dev=False):
+71         pipfile_path = pipfile.Pipfile.find()
+72 
+73         # Read and append Pipfile.
+74         with open(pipfile_path, 'r') as f:
+75             p = toml.loads(f.read())
+76 
+77             key = 'dev-packages' if dev else 'packages'
+78 
+79             # Set empty group if it doesn't exist yet.
+80             if key not in p:
+81                 p[key] = {}
+82 
+83             package = convert_deps_from_pip(package_name)
+84             package_name = package.keys()[0]
+85 
+86             # Add the package to the group.
+87             p[key][package_name] = package[package_name]
+88 
+89         # Write Pipfile.
+90         data = format_toml(toml.dumps(p))
+91         with open(pipfile_path, 'w') as f:
+92             f.write(data)
+","67             f.write(data)
+68 
+69     @staticmethod
+70     def add_package_to_pipfile(package_name, dev=False):
+71         pipfile_path = pipfile.Pipfile.find()
+72 
+73         # Read and append Pipfile.
+74         with open(pipfile_path, 'r') as f:
+75             p = toml.loads(f.read())
+76 
+77             key = 'dev-packages' if dev else 'packages'
+78 
+79             # Set empty group if it doesn't exist yet.
+80             if key not in p:
+81                 p[key] = {}
+82 
+83             package = convert_deps_from_pip(package_name)
+84             package_name = [k for k in package.keys()][0]
+85 
+86             # Add the package to the group.
+87             p[key][package_name] = package[package_name]
+88 
+89         # Write Pipfile.
+90         data = format_toml(toml.dumps(p))
+91         with open(pipfile_path, 'w') as f:
+92             f.write(data)
+","Before: 84
+After: 84",fix typo in project.py,python3 fixes,https://github.com/pypa/pipenv,pipenv/project.py,3d023a63d8d5b7c3e104f27b93dc65eaf33f1157,a5da8d984df96974a94158edc8e33ff15bb07829,0,750,"{'module': 1, 'expression_statement': 9, 'call': 10, 'attribute': 7, 'identifier': 44, '.': 7, 'argument_list': 10, '(': 11, ')': 11, 'decorated_definition': 1, 'decorator': 1, '@': 1, 'function_definition': 1, 'def': 1, 'parameters': 1, ',': 3, 'default_parameter': 1, '=': 9, 'false': 1, ':': 4, 'block': 4, 'assignment': 8, 'comment': 4, 'with_statement': 2, 'with': 2, 'with_clause': 2, 'with_item': 2, 'as_pattern': 2, 'string': 4, 'string_start': 4, 'string_content': 4, 'string_end': 4, 'as': 2, 'as_pattern_target': 2, 'conditional_expression': 1, 'if': 2, 'else': 1, 'if_statement': 1, 'comparison_operator': 1, 'not in': 2, 'subscript': 5, '[': 5, ']': 5, 'dictionary': 1, '{': 1, '}': 1, 'integer': 1}","{'cyclomatic_complexity': 1, 'nloc': 2, 'token_count': 15, 'name': '__init__', 'long_name': '__init__( self )', 'start_line': 12, 'end_line': 13, 'full_parameters': ['self'], 'filename': '/home/set-iitgn-vm/.local/lib/python3.10/site-packages/Minecpp/pipenv/prev/pipenv/project.py', 'top_nesting_level': 1, 'fan_in': 0, 'fan_out': 0, 'general_fan_out': 0}","{'cyclomatic_complexity': 1, 'nloc': 2, 'token_count': 15, 'name': '__init__', 'long_name': '__init__( self )', 'start_line': 12, 'end_line': 13, 'full_parameters': ['self'], 'filename': '/home/set-iitgn-vm/.local/lib/python3.10/site-packages/Minecpp/pipenv/curr/pipenv/project.py', 'top_nesting_level': 1, 'fan_in': 0, 'fan_out': 0, 'general_fan_out': 0}",0.9470301074174076,0.9462412889852664,"(tensor([0.9886]), tensor([0.9974]), tensor([0.9930]), tensor([0.9965]))",DEV,"The dev commit is more accurate, indicating that the change was made for Python 3 compatibility"
+"48     def lockfile_exists(self):
+49         return os.path.isfile(self.lockfile_location)
+50 
+51     def create_pipfile(self):
+52         data = {u'source': [{u'url': u'https://pypi.org/', u'verify_ssl': True}], u'packages': {}, 'dev-packages': {}}
+53         with open('Pipfile', 'w') as f:
+54             f.write(toml.dumps(data))
+55 
+56     @property
+","48     def lockfile_exists(self):
+49         return os.path.isfile(self.lockfile_location)
+50 
+51     def create_pipfile(self):
+52         data = {u'source': [{u'url': u'https://pypi.python.org/simple', u'verify_ssl': True}], u'packages': {}, 'dev-packages': {}}
+53         with open('Pipfile', 'w') as f:
+54             f.write(toml.dumps(data))
+55 
+56     @property
+","Before: 52
+After: 52",fix project.py -- a/pipenv/project.py -- b/pipenv/project.py,fix default source,https://github.com/pypa/pipenv,pipenv/project.py,33240ac6581188e363d2e4e21753a3071f57df86,cb22a129eae8c8e800e603c38bf1fe04d420fbde,0,446,"{'module': 1, 'function_definition': 2, 'def': 2, 'identifier': 17, 'parameters': 2, '(': 6, ')': 6, ':': 8, 'block': 3, 'return_statement': 1, 'return': 1, 'call': 4, 'attribute': 5, '.': 5, 'argument_list': 4, 'expression_statement': 2, 'assignment': 1, '=': 1, 'dictionary': 4, '{': 4, 'pair': 5, 'string': 8, 'string_start': 8, 'string_content': 8, 'string_end': 8, 'list': 1, '[': 1, ',': 4, 'true': 1, '}': 4, ']': 1, 'with_statement': 1, 'with': 1, 'with_clause': 1, 'with_item': 1, 'as_pattern': 1, 'as': 1, 'as_pattern_target': 1}","{'cyclomatic_complexity': 1, 'nloc': 2, 'token_count': 15, 'name': '__init__', 'long_name': '__init__( self )', 'start_line': 12, 'end_line': 13, 'full_parameters': ['self'], 'filename': '/home/set-iitgn-vm/.local/lib/python3.10/site-packages/Minecpp/pipenv/prev/pipenv/project.py', 'top_nesting_level': 1, 'fan_in': 0, 'fan_out': 0, 'general_fan_out': 0}","{'cyclomatic_complexity': 1, 'nloc': 2, 'token_count': 15, 'name': '__init__', 'long_name': '__init__( self )', 'start_line': 12, 'end_line': 13, 'full_parameters': ['self'], 'filename': '/home/set-iitgn-vm/.local/lib/python3.10/site-packages/Minecpp/pipenv/curr/pipenv/project.py', 'top_nesting_level': 1, 'fan_in': 0, 'fan_out': 0, 'general_fan_out': 0}",0.9690278768043126,0.9649418136286289,"(tensor([0.9871]), tensor([0.9949]), tensor([0.9910]), tensor([0.9941]))",DEV,"Tool message says that a change has been made to project.py, it is not very informative. It does not tell the reader what was fixed or changed"
+"1 import os
+2 try:
+3     from collections import OrderedDict
+4 except ImportError:
+5     from ordereddict import OrderedDict
+6 
+","1 import os
+2 
+3 import toml
+4 
+5 from requests.compat import OrderedDict
+6 
+7 from . import _pipfile as pipfile
+8 from .utils import format_toml, multi_split
+9 from .utils import convert_deps_from_pip, convert_deps_to_pip
+","Before: 2, 3, 4, 5
+After: 5, 6",use requests.compat if available,fixing OrderedDict,https://github.com/pypa/pipenv,pipenv/project.py,410444c815ef130eeaec156667fb17f53a60e41f,1889055917e4cbfabeda56215a1f3b0f8e80f8f6,0,9,"{'module': 1, 'import_statement': 1, 'import': 3, 'dotted_name': 5, 'identifier': 6, 'try_statement': 1, 'try': 1, ':': 2, 'block': 2, 'import_from_statement': 2, 'from': 2, 'except_clause': 1, 'except': 1}","{'cyclomatic_complexity': 6, 'nloc': 11, 'token_count': 74, 'name': 'mkdir_p', 'long_name': 'mkdir_p( newdir )', 'start_line': 14, 'end_line': 30, 'full_parameters': ['newdir'], 'filename': '/home/set-iitgn-vm/.local/lib/python3.10/site-packages/Minecpp/pipenv/prev/pipenv/project.py', 'top_nesting_level': 0, 'fan_in': 0, 'fan_out': 0, 'general_fan_out': 0}","{'cyclomatic_complexity': 6, 'nloc': 11, 'token_count': 74, 'name': 'mkdir_p', 'long_name': 'mkdir_p( newdir )', 'start_line': 12, 'end_line': 28, 'full_parameters': ['newdir'], 'filename': '/home/set-iitgn-vm/.local/lib/python3.10/site-packages/Minecpp/pipenv/curr/pipenv/project.py', 'top_nesting_level': 0, 'fan_in': 0, 'fan_out': 0, 'general_fan_out': 0}",0.116815707716791,0.0820441176883657,"(tensor([0.7589]), tensor([0.8681]), tensor([0.8098]), tensor([0.8558]))",BOTH,"Dev message is informing that the change is related to making the code compatible with OrderedDict while Tool message is somewhat descriptive, indicating that the code now uses requests.compat for OrderedDict if available"
+"1 __version__ = '3.2.5'
+","1 __version__ = '3.2.TEST'
+","Before: 1
+After: 1",update pipenv to 3.2.test,"Revert ""Merge branch 'master' into fix_link_parsing""",https://github.com/pypa/pipenv,pipenv/__version__.py,94eb22a8ce1c16bceb705ffe3156a565e306fab8,848ea144a6b520a7cd8e767466546474a31b7621,0,10,{'module': 1},{},{},0.537284965911771,0.0,"(tensor([0.8772]), tensor([0.9301]), tensor([0.9029]), tensor([0.9245]))",TOOL,"Tool clearly explains the fix, while Dev message is not relevant"
+"9 from .utils import convert_deps_from_pip, convert_deps_to_pip
+10 
+11 
+12 def mkdir_p(newdir):
+13     """"""works the way a good mkdir should :)
+14         - already exists, silently complete
+15         - regular file in the way, raise an exception
+16         - parent directory(ies) does not exist, make them as well
+17         From: http://code.activestate.com/recipes/82465-a-friendly-mkdir/
+18     """"""
+19     if os.path.isdir(newdir):
+20         pass
+21     elif os.path.isfile(newdir):
+22         raise OSError(""a file with the same name as the desired dir, '%s', already exists."" % newdir)
+23     else:
+24         head, tail = os.path.split(newdir)
+25         if head and not os.path.isdir(head):
+26             _mkdir(head)
+27         if tail:
+28             os.mkdir(newdir)
+29 
+30 
+","9 from .utils import convert_deps_from_pip, convert_deps_to_pip
+10 
+11 
+12 def mkdir_p(newdir):
+13     """"""works the way a good mkdir should :)
+14         - already exists, silently complete
+15         - regular file in the way, raise an exception
+16         - parent directory(ies) does not exist, make them as well
+17         From: http://code.activestate.com/recipes/82465-a-friendly-mkdir/
+18     """"""
+19     if os.path.isdir(newdir):
+20         pass
+21     elif os.path.isfile(newdir):
+22         raise OSError(""a file with the same name as the desired dir, '%s', already exists."" % newdir)
+23     else:
+24         head, tail = os.path.split(newdir)
+25         if head and not os.path.isdir(head):
+26             mkdir_p(head)
+27         if tail:
+28             os.mkdir(newdir)
+29 
+30 
+","Before: 26
+After: 26",fix typo in project.py,Fix unknown function,https://github.com/pypa/pipenv,pipenv/project.py,67c5204fad3bf44af5e8ad2c0dbdbf0e4d075f02,48e5d064ffe1e68d399dd1f971db272fdf3cde82,0,162,"{'module': 1, 'import_from_statement': 1, 'from': 1, 'relative_import': 1, 'import_prefix': 1, '.': 10, 'dotted_name': 3, 'identifier': 32, 'import': 1, ',': 2, 'function_definition': 1, 'def': 1, 'parameters': 1, '(': 8, ')': 8, ':': 6, 'block': 6, 'expression_statement': 4, 'string': 2, 'string_start': 2, 'string_content': 2, 'string_end': 2, 'if_statement': 3, 'if': 3, 'call': 7, 'attribute': 9, 'argument_list': 7, 'pass_statement': 1, 'pass': 1, 'elif_clause': 1, 'elif': 1, 'raise_statement': 1, 'raise': 1, 'binary_operator': 1, '%': 1, 'else_clause': 1, 'else': 1, 'assignment': 1, 'pattern_list': 1, '=': 1, 'boolean_operator': 1, 'and': 1, 'not_operator': 1, 'not': 1}","{'cyclomatic_complexity': 6, 'nloc': 11, 'token_count': 74, 'name': 'mkdir_p', 'long_name': 'mkdir_p( newdir )', 'start_line': 12, 'end_line': 28, 'full_parameters': ['newdir'], 'filename': '/home/set-iitgn-vm/.local/lib/python3.10/site-packages/Minecpp/pipenv/prev/pipenv/project.py', 'top_nesting_level': 0, 'fan_in': 0, 'fan_out': 0, 'general_fan_out': 0}","{'cyclomatic_complexity': 6, 'nloc': 11, 'token_count': 74, 'name': 'mkdir_p', 'long_name': 'mkdir_p( newdir )', 'start_line': 12, 'end_line': 28, 'full_parameters': ['newdir'], 'filename': '/home/set-iitgn-vm/.local/lib/python3.10/site-packages/Minecpp/pipenv/curr/pipenv/project.py', 'top_nesting_level': 0, 'fan_in': 0, 'fan_out': 0, 'general_fan_out': 0}",0.9835236864262558,0.9823297125839954,"(tensor([0.9974]), tensor([0.9982]), tensor([0.9978]), tensor([0.9981]))",NONE,Tool is lacking content about which type it fixed. Dev message is very unclear.
+"43         return d_dir
+44 
+45     @property
+46     def proper_names_location(self):
+47         pn_file = os.sep.join(self.pipfile_location.split(os.sep)[:-1] + ['.venv', 'pipenev-proper-names.txt'])
+48 
+49         # Create the database, if it doesn't exist.
+50         open(pn_file, 'a').close()
+51 
+52         return pn_file
+53 
+54     @property
+","43         return d_dir
+44 
+45     @property
+46     def proper_names_location(self):
+47         pn_file = os.sep.join(self.virtualenv_location.split(os.sep) + ['pipenev-proper-names.txt'])
+48 
+49         # Create the database, if it doesn't exist.
+50         open(pn_file, 'a').close()
+51 
+52         return pn_file
+53 
+54     @property
+","Before: 47
+After: 47",fix pipfile_location and virtualenv_location,bugfix,https://github.com/pypa/pipenv,pipenv/project.py,5370b0dc00ee39f2683b06ce2c893861e3a4d206,4c38b14aec295c233fc93b41234b6b48179eb200,0,364,"{'module': 1, 'return_statement': 2, 'return': 2, 'identifier': 17, 'decorated_definition': 1, 'decorator': 1, '@': 1, 'function_definition': 1, 'def': 1, 'parameters': 1, '(': 5, ')': 5, ':': 2, 'block': 1, 'expression_statement': 2, 'assignment': 1, '=': 1, 'call': 4, 'attribute': 6, '.': 6, 'argument_list': 4, 'binary_operator': 1, 'subscript': 1, '[': 2, 'slice': 1, 'unary_operator': 1, '-': 1, 'integer': 1, ']': 2, '+': 1, 'list': 1, 'string': 3, 'string_start': 3, 'string_content': 3, 'string_end': 3, ',': 2, 'comment': 1}","{'cyclomatic_complexity': 1, 'nloc': 2, 'token_count': 15, 'name': '__init__', 'long_name': '__init__( self )', 'start_line': 16, 'end_line': 17, 'full_parameters': ['self'], 'filename': '/home/set-iitgn-vm/.local/lib/python3.10/site-packages/Minecpp/pipenv/prev/pipenv/project.py', 'top_nesting_level': 1, 'fan_in': 0, 'fan_out': 0, 'general_fan_out': 0}","{'cyclomatic_complexity': 1, 'nloc': 2, 'token_count': 15, 'name': '__init__', 'long_name': '__init__( self )', 'start_line': 16, 'end_line': 17, 'full_parameters': ['self'], 'filename': '/home/set-iitgn-vm/.local/lib/python3.10/site-packages/Minecpp/pipenv/curr/pipenv/project.py', 'top_nesting_level': 1, 'fan_in': 0, 'fan_out': 0, 'general_fan_out': 0}",0.8135761271716819,0.8108308584965338,"(tensor([0.9878]), tensor([0.9698]), tensor([0.9787]), tensor([0.9715]))",TOOL,"Tool message specifies what the change is related to, and helps to understand the modification without looking into the code. Dev message is not useful at all."
+"120         data = {u'source': [{u'url': u'https://pypi.python.org/simple', u'verify_ssl': True}], u'packages': {}, 'dev-packages': {}}
+121         self.write_toml(data, 'Pipfile')
+122 
+123     def write_toml(self, data, path=None):
+124         if path is None:
+125             path = self.pipfile_location
+126         with open(path, 'w') as f:
+127             f.write(format_toml(toml.dumps(data)))
+128 
+129     @property
+","120         data = {u'source': [{u'url': u'https://pypi.python.org/simple', u'verify_ssl': True}], u'packages': {}, 'dev-packages': {}}
+121         self.write_toml(data, 'Pipfile')
+122 
+123     def write_toml(self, data, path=None):
+124         if path is None:
+125             path = self.pipfile_location
+126 
+127         formatted_data = format_toml(toml.dumps(data))
+128         with open(path, 'w') as f:
+129             f.write(formatted_data)
+130 
+131     @property
+","Before: 127
+After: 129",fix error in project.write_toml,prepare formatted content outside of write block,https://github.com/pypa/pipenv,pipenv/project.py,be68accaea82b5ff89118143ccfb4711e353b5b4,6eb16cd053d21dcb33dd4f00bbac51a8a11e8ae6,1,1054,"{'module': 1, 'expression_statement': 4, 'assignment': 2, 'identifier': 21, '=': 3, 'dictionary': 4, '{': 4, 'pair': 5, 'string': 8, 'string_start': 8, 'string_content': 8, 'string_end': 8, ':': 8, 'list': 1, '[': 1, ',': 7, 'true': 1, '}': 4, ']': 1, 'call': 5, 'attribute': 4, '.': 4, 'argument_list': 5, '(': 6, ')': 6, 'function_definition': 1, 'def': 1, 'parameters': 1, 'default_parameter': 1, 'none': 2, 'block': 3, 'if_statement': 1, 'if': 1, 'comparison_operator': 1, 'is': 1, 'with_statement': 1, 'with': 1, 'with_clause': 1, 'with_item': 1, 'as_pattern': 1, 'as': 1, 'as_pattern_target': 1}","{'cyclomatic_complexity': 1, 'nloc': 7, 'token_count': 40, 'name': '__init__', 'long_name': '__init__( self )', 'start_line': 18, 'end_line': 24, 'full_parameters': ['self'], 'filename': '/home/set-iitgn-vm/.local/lib/python3.10/site-packages/Minecpp/pipenv/prev/pipenv/project.py', 'top_nesting_level': 1, 'fan_in': 0, 'fan_out': 0, 'general_fan_out': 0}","{'cyclomatic_complexity': 1, 'nloc': 7, 'token_count': 40, 'name': '__init__', 'long_name': '__init__( self )', 'start_line': 18, 'end_line': 24, 'full_parameters': ['self'], 'filename': '/home/set-iitgn-vm/.local/lib/python3.10/site-packages/Minecpp/pipenv/curr/pipenv/project.py', 'top_nesting_level': 1, 'fan_in': 0, 'fan_out': 0, 'general_fan_out': 0}",0.8643197817127268,0.8497116444828652,"(tensor([0.9757]), tensor([0.9895]), tensor([0.9825]), tensor([0.9881]))",DEV,Dev message provides more context and clarifies the intent of the change. Tool message lacks clarity.
+"38         return os.path.isdir(self.virtualenv_location)
+39 
+40     @property
+41     def virtualenv_location(self):
+42 
+43         # Use cached version, if available.
+44         if self._virtualenv_location:
+45             return self._virtualenv_location
+46 
+47         # The user wants the virtualenv in the project.
+48         if not PIPENV_VENV_IN_PROJECT:
+49             c = delegator.run('pew dir {0}'.format(self.name))
+50             loc = c.out.strip()
+51         # Default mode.
+52         else:
+53             loc = os.sep.join(self.pipfile_location.split(os.sep)[:-1] + ['.venv'])
+54 
+55         self._virtualenv_location = loc
+56         return loc
+57 
+58     @property
+","38         return os.path.isdir(self.virtualenv_location)
+39 
+40     @property
+41     def virtualenv_location(self):
+42 
+43         # Use cached version, if available.
+44         if self._virtualenv_location:
+45             return self._virtualenv_location
+46 
+47         # The user wants the virtualenv in the project.
+48         if not PIPENV_VENV_IN_PROJECT:
+49             c = delegator.run('pew dir ""{0}""'.format(self.name))
+50             loc = c.out.strip()
+51         # Default mode.
+52         else:
+53             loc = os.sep.join(self.pipfile_location.split(os.sep)[:-1] + ['.venv'])
+54 
+55         self._virtualenv_location = loc
+56         return loc
+57 
+58     @property
+","Before: 49
+After: 49",fix typo in project.py,Double quote the paths,https://github.com/pypa/pipenv,pipenv/project.py,b425977ce0201ac268a45536b06b41ad1a650501,67e090f2d7204a66c99c4c2acb38da149fd40c9b,1,322,"{'module': 1, 'return_statement': 3, 'return': 3, 'call': 6, 'attribute': 16, 'identifier': 36, '.': 16, 'argument_list': 6, '(': 7, ')': 7, 'decorated_definition': 1, 'decorator': 1, '@': 1, 'function_definition': 1, 'def': 1, 'parameters': 1, ':': 5, 'comment': 3, 'block': 4, 'if_statement': 2, 'if': 2, 'not_operator': 1, 'not': 1, 'expression_statement': 4, 'assignment': 4, '=': 4, 'string': 2, 'string_start': 2, 'string_content': 2, 'string_end': 2, 'else_clause': 1, 'else': 1, 'binary_operator': 1, 'subscript': 1, '[': 2, 'slice': 1, 'unary_operator': 1, '-': 1, 'integer': 1, ']': 2, '+': 1, 'list': 1}","{'cyclomatic_complexity': 1, 'nloc': 7, 'token_count': 40, 'name': '__init__', 'long_name': '__init__( self )', 'start_line': 18, 'end_line': 24, 'full_parameters': ['self'], 'filename': '/home/set-iitgn-vm/.local/lib/python3.10/site-packages/Minecpp/pipenv/prev/pipenv/project.py', 'top_nesting_level': 1, 'fan_in': 0, 'fan_out': 0, 'general_fan_out': 0}","{'cyclomatic_complexity': 1, 'nloc': 7, 'token_count': 40, 'name': '__init__', 'long_name': '__init__( self )', 'start_line': 18, 'end_line': 24, 'full_parameters': ['self'], 'filename': '/home/set-iitgn-vm/.local/lib/python3.10/site-packages/Minecpp/pipenv/curr/pipenv/project.py', 'top_nesting_level': 1, 'fan_in': 0, 'fan_out': 0, 'general_fan_out': 0}",0.9547309878401472,0.9521767448483492,"(tensor([0.9998]), tensor([0.9998]), tensor([0.9998]), tensor([0.9998]))",DEV,"Dev message is clear and concise, Tool message is too vague"
+"38         return os.path.isdir(self.virtualenv_location)
+39 
+40     @property
+41     def virtualenv_location(self):
+42 
+43         # Use cached version, if available.
+44         if self._virtualenv_location:
+45             return self._virtualenv_location
+46 
+47         # The user wants the virtualenv in the project.
+48         if not PIPENV_VENV_IN_PROJECT:
+49             c = delegator.run('pew dir ""{0}""'.format(self.name))
+50             loc = c.out.strip()
+51         # Default mode.
+52         else:
+53             loc = os.sep.join(self.pipfile_location.split(os.sep)[:-1] + ['.venv'])
+54 
+55         self._virtualenv_location = loc
+56         return loc
+57 
+58     @property
+","58         return sanitized + '-' + encoded_hash
+59 
+60     @property
+61     def virtualenv_location(self):
+62 
+63         # Use cached version, if available.
+64         if self._virtualenv_location:
+65             return self._virtualenv_location
+66 
+67         # The user wants the virtualenv in the project.
+68         if not PIPENV_VENV_IN_PROJECT:
+69             c = delegator.run('pew dir ""{0}""'.format(self.virtualenv_name))
+70             loc = c.out.strip()
+71         # Default mode.
+72         else:
+73             loc = os.sep.join(self.pipfile_location.split(os.sep)[:-1] + ['.venv'])
+74 
+75         self._virtualenv_location = loc
+76         return loc
+77 
+78     @property
+","Before: 49
+After: 69",add virtualenv_name and virtualenv_exists,Change the naming scheme of virtualenv,https://github.com/pypa/pipenv,pipenv/project.py,a81197d6bf81a68d02cfcecda8a82e0de9b8be85,b425977ce0201ac268a45536b06b41ad1a650501,1,322,"{'module': 1, 'return_statement': 3, 'return': 3, 'call': 6, 'attribute': 16, 'identifier': 36, '.': 16, 'argument_list': 6, '(': 7, ')': 7, 'decorated_definition': 1, 'decorator': 1, '@': 1, 'function_definition': 1, 'def': 1, 'parameters': 1, ':': 5, 'comment': 3, 'block': 4, 'if_statement': 2, 'if': 2, 'not_operator': 1, 'not': 1, 'expression_statement': 4, 'assignment': 4, '=': 4, 'string': 2, 'string_start': 2, 'string_content': 2, 'string_end': 2, 'else_clause': 1, 'else': 1, 'binary_operator': 1, 'subscript': 1, '[': 2, 'slice': 1, 'unary_operator': 1, '-': 1, 'integer': 1, ']': 2, '+': 1, 'list': 1}","{'cyclomatic_complexity': 1, 'nloc': 7, 'token_count': 40, 'name': '__init__', 'long_name': '__init__( self )', 'start_line': 18, 'end_line': 24, 'full_parameters': ['self'], 'filename': '/home/set-iitgn-vm/.local/lib/python3.10/site-packages/Minecpp/pipenv/prev/pipenv/project.py', 'top_nesting_level': 1, 'fan_in': 0, 'fan_out': 0, 'general_fan_out': 0}","{'cyclomatic_complexity': 1, 'nloc': 7, 'token_count': 40, 'name': '__init__', 'long_name': '__init__( self )', 'start_line': 21, 'end_line': 27, 'full_parameters': ['self'], 'filename': '/home/set-iitgn-vm/.local/lib/python3.10/site-packages/Minecpp/pipenv/curr/pipenv/project.py', 'top_nesting_level': 1, 'fan_in': 0, 'fan_out': 0, 'general_fan_out': 0}",0.5449817983286196,0.5211716496315603,"(tensor([0.9460]), tensor([0.9566]), tensor([0.9513]), tensor([0.9556]))",BOTH,Dev provides context for the change and Tool describes what is changed.
+"10 
+11 import delegator
+12 from requests.compat import OrderedDict
+13 
+14 from .utils import (format_toml, mkdir_p, convert_deps_from_pip,
+15     pep426_name, recase_file)
+16 from .environments import PIPENV_MAX_DEPTH, PIPENV_VENV_IN_PROJECT
+17 
+18 
+19 class Project(object):
+","10 
+11 import delegator
+12 from requests.compat import OrderedDict
+13 
+14 from .utils import (format_toml, mkdir_p, convert_deps_from_pip,
+15     pep423_name, recase_file)
+16 from .environments import PIPENV_MAX_DEPTH, PIPENV_VENV_IN_PROJECT
+17 
+18 
+19 class Project(object):
+","Before: 15
+After: 15",replace pep426_name with pep423_name,fix bad PEP reference on name normalization function,https://github.com/pypa/pipenv,pipenv/project.py,d1a8d73911abbea41a69f3eb0fdd9fcc532b4608,d4527aa35fef9a6eb22ac66a97d3d6a80b666b2d,1,68,"{'module': 1, 'import_statement': 1, 'import': 4, 'dotted_name': 12, 'identifier': 13, 'import_from_statement': 3, 'from': 3, '.': 3, 'relative_import': 2, 'import_prefix': 2, '(': 1, ',': 5, ')': 1}","{'cyclomatic_complexity': 1, 'nloc': 7, 'token_count': 40, 'name': '__init__', 'long_name': '__init__( self )', 'start_line': 21, 'end_line': 27, 'full_parameters': ['self'], 'filename': '/home/set-iitgn-vm/.local/lib/python3.10/site-packages/Minecpp/pipenv/prev/pipenv/project.py', 'top_nesting_level': 1, 'fan_in': 0, 'fan_out': 0, 'general_fan_out': 0}","{'cyclomatic_complexity': 1, 'nloc': 7, 'token_count': 40, 'name': '__init__', 'long_name': '__init__( self )', 'start_line': 21, 'end_line': 27, 'full_parameters': ['self'], 'filename': '/home/set-iitgn-vm/.local/lib/python3.10/site-packages/Minecpp/pipenv/curr/pipenv/project.py', 'top_nesting_level': 1, 'fan_in': 0, 'fan_out': 0, 'general_fan_out': 0}",0.9370011451812968,0.9312347104671022,"(tensor([0.9977]), tensor([0.9977]), tensor([0.9977]), tensor([0.9977]))",DEV,Dev message explains the change and why it is made. Tool only specifies what change is made.
+"134             return toml.load(f, _dict=OrderedDict)
+135 
+136     @property
+137     def _pipfile(self):
+138         """"""Pipfile divided by PyPI and external dependencies.""""""
+139         pfile = self.parsed_pipfile
+140         for section in ('packages', 'dev-packages'):
+141             p_section = pfile.get(section, {})
+142 
+143             for key in list(p_section.keys()):
+144                 # Normalize key name to pep426.
+145                 norm_key = pep426_name(key)
+146                 p_section[norm_key] = p_section.pop(key)
+147 
+148         return pfile
+149 
+150     @property
+","134             return toml.load(f, _dict=OrderedDict)
+135 
+136     @property
+137     def _pipfile(self):
+138         """"""Pipfile divided by PyPI and external dependencies.""""""
+139         pfile = self.parsed_pipfile
+140         for section in ('packages', 'dev-packages'):
+141             p_section = pfile.get(section, {})
+142 
+143             for key in list(p_section.keys()):
+144                 # Normalize key name to PEP 423.
+145                 norm_key = pep423_name(key)
+146                 p_section[norm_key] = p_section.pop(key)
+147 
+148         return pfile
+149 
+150     @property
+","Before: 144, 145
+After: 144, 145",replace pep426_name with pep423_name,fix bad PEP reference on name normalization function,https://github.com/pypa/pipenv,pipenv/project.py,d1a8d73911abbea41a69f3eb0fdd9fcc532b4608,d4527aa35fef9a6eb22ac66a97d3d6a80b666b2d,1,1029,"{'module': 1, 'return_statement': 2, 'return': 2, 'call': 6, 'attribute': 5, 'identifier': 29, '.': 5, 'argument_list': 6, '(': 8, ',': 3, 'keyword_argument': 1, '=': 5, ')': 8, 'decorated_definition': 1, 'decorator': 1, '@': 1, 'function_definition': 1, 'def': 1, 'parameters': 1, ':': 3, 'block': 3, 'expression_statement': 5, 'string': 3, 'string_start': 3, 'string_content': 3, 'string_end': 3, 'assignment': 4, 'for_statement': 2, 'for': 2, 'in': 2, 'tuple': 1, 'dictionary': 1, '{': 1, '}': 1, 'comment': 1, 'subscript': 1, '[': 1, ']': 1}","{'cyclomatic_complexity': 1, 'nloc': 7, 'token_count': 40, 'name': '__init__', 'long_name': '__init__( self )', 'start_line': 21, 'end_line': 27, 'full_parameters': ['self'], 'filename': '/home/set-iitgn-vm/.local/lib/python3.10/site-packages/Minecpp/pipenv/prev/pipenv/project.py', 'top_nesting_level': 1, 'fan_in': 0, 'fan_out': 0, 'general_fan_out': 0}","{'cyclomatic_complexity': 1, 'nloc': 7, 'token_count': 40, 'name': '__init__', 'long_name': '__init__( self )', 'start_line': 21, 'end_line': 27, 'full_parameters': ['self'], 'filename': '/home/set-iitgn-vm/.local/lib/python3.10/site-packages/Minecpp/pipenv/curr/pipenv/project.py', 'top_nesting_level': 1, 'fan_in': 0, 'fan_out': 0, 'general_fan_out': 0}",0.9420908181168864,0.9376788750743728,"(tensor([0.9955]), tensor([0.9961]), tensor([0.9958]), tensor([0.9960]))",DEV,Dev message precisely focuses on the problem and tells why the change is made. Tool message tells more about what change.
+"24 
+25 # Tells Pipenv to use Python three by default.
+26 PIPENV_DEFAULT_THREE = os.environ.get('PIPENV_DEFAULT_THREE')
+27 
+28 # Tells Pipenv to use the virtualenv-provided pip instead.
+29 PIPENV_USE_SYSTEM = os.environ.get('VIRTUAL_ENV') if not 'PIPENV_IGNORE_VIRTUALENVS' in os.environ else False
+30 
+31 # Use shell compatibility mode when using venv in project mode.
+32 if PIPENV_VENV_IN_PROJECT:
+33     PIPENV_SHELL_COMPAT = True
+","24 
+25 # Tells Pipenv to use Python three by default.
+26 PIPENV_DEFAULT_THREE = os.environ.get('PIPENV_DEFAULT_THREE')
+27 
+28 # Tells Pipenv to use the virtualenv-provided pip instead.
+29 PIPENV_USE_SYSTEM = os.environ.get('VIRTUAL_ENV') if 'PIPENV_IGNORE_VIRTUALENVS' not in os.environ else False
+30 
+31 # Use shell compatibility mode when using venv in project mode.
+32 if PIPENV_VENV_IN_PROJECT:
+33     PIPENV_SHELL_COMPAT = True
+","Before: 29
+After: 29",add pipenv_timeout to environments.py,fixed syntax in PIPENV_USE_SYSTEM and added an environment variable for PIPENV_TIMEOUT,https://github.com/pypa/pipenv,pipenv/environments.py,50e278a10268a00b95cd366cb69abcf36e739001,d73c15fe2a4bf01ebf8d1c2e0d87c0140d24c98a,0,196,"{'module': 1, 'comment': 3, 'expression_statement': 2, 'assignment': 2, 'identifier': 11, '=': 2, 'call': 2, 'attribute': 5, '.': 5, 'argument_list': 2, '(': 2, 'string': 3, 'string_start': 3, 'string_content': 3, 'string_end': 3, ')': 2, 'conditional_expression': 1, 'if': 2, 'not_operator': 1, 'not': 1, 'comparison_operator': 1, 'in': 1, 'else': 1, 'false': 1, 'if_statement': 1, ':': 1, 'block': 1}",{},{},0.9477534597131252,0.9477534597131252,"(tensor([0.9965]), tensor([0.9965]), tensor([0.9965]), tensor([0.9965]))",DEV,"This commit has 2 changes. Dev tells about both the changes while Tool only mentions. Making 2 fixes in a commit is a bad practice, but if it is made, at least the commit should describe the fix instead of ignoring one change."
+"35 # Disable spinner on windows.
+36 if os.name == 'nt':
+37     PIPENV_NOSPIN = True
+38 
+39 # Tells pipenv how long to wait for virtualenvs to be created in seconds
+40 PIPENV_TIMEOUT = os.environ.get('PIPENV_TIMEOUT') or 120
+","35 # Disable spinner on windows.
+36 if os.name == 'nt':
+37     PIPENV_NOSPIN = True
+38 
+39 # Tells pipenv how long to wait for virtualenvs to be created in seconds
+40 PIPENV_TIMEOUT = int(os.environ.get('PIPENV_TIMEOUT')) or 120
+","Before: 40
+After: 40",use int instead of float for pipenv_timeout,fixed a type error when setting a custom value for PIPENV_TIMEOUT,https://github.com/pypa/pipenv,pipenv/environments.py,1818dc6afa859295f91ca9b0ce1c56b0d3c8e2d3,f784c554f8d7bca03049ed64ea6bac36acb8dd17,0,249,"{'module': 1, 'comment': 2, 'if_statement': 1, 'if': 1, 'comparison_operator': 1, 'attribute': 1, 'identifier': 3, '.': 1, '==': 1, 'string': 1, 'string_start': 1, 'string_content': 1, 'string_end': 1, ':': 1, 'block': 1, 'expression_statement': 1, 'assignment': 1, '=': 1, 'true': 1}",{},{},0.8823421956644774,0.889689027129348,"(tensor([0.9926]), tensor([0.9976]), tensor([0.9951]), tensor([0.9971]))",DEV,"Dev message is very clear, descriptive and provides context. Tool message is as descriptive."
+"1 #     ___     ( )  ___      ___       __
+2 #   //   ) ) / / //   ) ) //___) ) //   ) ) ||  / /
+3 #  //___/ / / / //___/ / //       //   / /  || / /
+4 # //       / / //       ((____   //   / /   ||/ /
+5 
+6 __version__ = '6.0.0'
+","1 #     ___     ( )  ___      ___       __
+2 #   //   ) ) / / //   ) ) //___) ) //   ) ) ||  / /
+3 #  //___/ / / / //___/ / //       //   / /  || / /
+4 # //       / / //       ((____   //   / /   ||/ /
+5 
+6 __version__ = '6.0.1'
+","Before: 6
+After: 6",update version in pipenv to 6.0.1,fix the bug,https://github.com/pypa/pipenv,pipenv/__version__.py,0884769b3a9bbb22d85e07c8640632f96b4db269,52876e1f4ae8679e2480fc30fe8f2cb06a7b50bd,0,14,"{'module': 1, 'comment': 4}",{},{},0.9714096315198544,0.9589116819762624,"(tensor([0.9947]), tensor([0.9967]), tensor([0.9957]), tensor([0.9965]))",TOOL,"Tool clearly explains the fix, Dev is very vague"
